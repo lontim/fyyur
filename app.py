@@ -8,24 +8,47 @@ import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
+from sqlalchemy import ForeignKey, Column, Table
+from sqlalchemy.orm import declarative_base, relationship
+
 from forms import *
+import os
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
 # TODO: connect to a local postgresql database
 
+migrate = Migrate(app, db)
+
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
+
+genres_venues_association_table = Table(
+    "genres_venues_association",
+    db.Model.metadata,
+    Column("venue_id", ForeignKey("Venue.id"), primary_key=True),
+    Column("genre_id", ForeignKey("Genres.id"), primary_key=True),
+)
+
+class Genres(db.Model):
+    __tablename__ = 'Genres'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
@@ -40,6 +63,9 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
+
+    genres = relationship("Child", secondary=genres_venues_association_table)
+
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -510,12 +536,12 @@ if not app.debug:
 #----------------------------------------------------------------------------#
 
 # Default port:
+'''
 if __name__ == '__main__':
     app.run()
-
-# Or specify port manually:
 '''
+
+# Specify port manually:
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-'''
