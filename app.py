@@ -17,6 +17,7 @@ from sqlalchemy.orm import declarative_base, relationship
 
 from forms import *
 import os
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -65,6 +66,8 @@ class Venue(db.Model):
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
     genres = relationship("Child", secondary=genres_venues_association_table)
+    seeking_talent = db.Column(db.Boolean, default=False)
+    seeing_desc = db.Column(db.String)
 
 
 class Artist(db.Model):
