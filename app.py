@@ -16,6 +16,8 @@ from flask_wtf import Form
 from forms import *
 import os
 
+from models import *
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -31,8 +33,7 @@ db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
 
-from models import create_models
-create_models(app, db)
+
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -62,28 +63,34 @@ def index():
 @app.route('/venues')
 def venues():
   # TODO: replace with real venues data.
-  #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
+  #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.   
+  venues = Venue.query.all()
+  data=[]
+  city_states = db.session.query (Venue.city, Venue.state) .distinct(
+    Venue.city, Venue.state
+  )
+  for city_state in city_states:
+        data.append({"city": city_state[0], "state": city_state[1], "venues": []})
+  for venue in venues:
+    upcoming_shows_in_venue = 0
+    shows = Show.query.filter_by(venue_id=venue.id).all()
+
+    for show in shows:
+        if show.start_time > datetime.now():
+            upcoming_shows_in_venue += 1
+
+    for venue_location in data:
+        if (
+            venue.state == venue_location["state"]
+            and venue.city == venue_location["city"]
+        ):
+            venue_location["venues"].append(
+                {
+                    "id": venue.id,
+                    "name": venue.name,
+                    "num_upcoming_shows": upcoming_shows_in_venue
+                }
+            )
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
@@ -105,6 +112,9 @@ def search_venues():
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
+  return render_template( 'pages/show_venue.html', venue = Venue.query.get(venue_id) )
+
+  '''
   data1={
     "id": 1,
     "name": "The Musical Hop",
@@ -184,6 +194,7 @@ def show_venue(venue_id):
   }
   data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
   return render_template('pages/show_venue.html', venue=data)
+  '''
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -490,6 +501,18 @@ if not app.debug:
 if __name__ == '__main__':
     app.run()
 '''
+@app.shell_context_processor
+def make_shell_context():
+    return {
+            'db': db,
+            'app': app,
+            'Genre': Genre,
+            'Venue': Venue,
+            'Show': Show,
+            'genre_venue_assoc': genre_venue_association_table,
+            'Artist': Artist
+            }
+
 
 # Specify port manually:
 if __name__ == '__main__':
