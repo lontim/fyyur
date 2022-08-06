@@ -7,15 +7,23 @@ from sqlalchemy.orm import declarative_base, relationship
 
 def create_models(app, db):
 
-    genres_venues_association_table = Table(
-        "genres_venues_association",
+    class Show(db.Model):
+        __tablename__ = 'Show'
+
+        id = db.Column(db.Integer, primary_key=True)
+        venue_id = db.Column("venue_id", ForeignKey("Venue.id"))
+        artist_id = db.Column("artist_id", ForeignKey("Artist.id"))
+        show_start_time = db.Column(db.DateTime)
+
+    genre_venue_association_table = Table(
+        "genre_venue_assoc",
         db.Model.metadata,
         Column("venue_id", ForeignKey("Venue.id"), primary_key=True),
-        Column("genre_id", ForeignKey("Genres.id"), primary_key=True),
+        Column("genre_id", ForeignKey("Genre.id"), primary_key=True),
     )
 
     class Genres(db.Model):
-        __tablename__ = 'Genres'
+        __tablename__ = 'Genre'
 
         id = db.Column(db.Integer, primary_key=True)
         name = db.Column(db.String)
@@ -35,7 +43,7 @@ def create_models(app, db):
 
         # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
-        genres = relationship("Child", secondary=genres_venues_association_table)
+        genres = relationship("Child", secondary=genre_venue_association_table)
         seeking_talent = db.Column(db.Boolean, default=False)
         seeing_desc = db.Column(db.String)
 
