@@ -2,23 +2,10 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-from flask import Flask
-from flask_moment import Moment
-from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, Column, Table
 from sqlalchemy.orm import declarative_base, relationship
-
-#----------------------------------------------------------------------------#
-# App Config.
-#----------------------------------------------------------------------------#
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-moment = Moment(app)
-app.config.from_object('config')
-db = SQLAlchemy(app)
-migrate = Migrate(app,db)
+from common_handles import db, migrate
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -88,5 +75,3 @@ class Artist(db.Model):
     def __repr__(self):
       artist = "Artist(" + self.id + ", " + self.name + ", " + self.city + ")"
       return artist
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.

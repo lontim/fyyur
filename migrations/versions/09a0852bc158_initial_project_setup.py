@@ -1,4 +1,4 @@
-"""Initial project setup
+"""1) Initial project setup
 
 Revision ID: 09a0852bc158
 Revises: 

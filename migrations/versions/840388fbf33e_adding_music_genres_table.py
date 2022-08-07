@@ -1,4 +1,4 @@
-"""Adding music genres table
+"""2) Adding music genres table
 
 Revision ID: 840388fbf33e
 Revises: 09a0852bc158

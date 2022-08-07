@@ -1,4 +1,4 @@
-"""Adding show to the model - with show DateTime
+"""4) Adding show to the model - with show DateTime
 
 Revision ID: a920576e1016
 Revises: 6b69c803549b
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'a920576e1016'
-down_revision = '6b69c803549b'
+down_revision = '8d00ec30e8d4'
 branch_labels = None
 depends_on = None
 
