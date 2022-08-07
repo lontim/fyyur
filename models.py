@@ -39,6 +39,13 @@ genre_venue_association_table = Table(
     Column("genre_id", ForeignKey("Genre.id"), primary_key=True),
 )
 
+genre_artist_association_table = Table(
+    "genre_artist_assoc",
+    db.Model.metadata,
+    Column("artist_id", ForeignKey("Artist.id"), primary_key=True),
+    Column("genre_id", ForeignKey("Genre.id"), primary_key=True),
+)
+
 class Genre(db.Model):
     __tablename__ = 'Genre'
 
@@ -58,15 +65,12 @@ class Venue(db.Model):
     website = db.Column(db.String(500))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-    genres = relationship("Genre", secondary=genre_venue_association_table)
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_desc = db.Column(db.String)
+    genres = relationship("Genre", secondary=genre_venue_association_table)
 
     def __repr__(self):
-        venue = "Venue(" + self.id + "," + str(self.name) + ")"
+        venue = "Venue(" + self.id + ", " + str(self.name) + ")"
         return venue
 
 class Artist(db.Model):
@@ -77,13 +81,12 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    genres = relationship("Genre", secondary=genre_artist_association_table)
    
     def __repr__(self):
-      return f'<Artist {self.id} name: {self.name} city: {self.city}>'
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+      artist = "Artist(" + self.id + ", " + self.name + ", " + self.city + ")"
+      return artist
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.

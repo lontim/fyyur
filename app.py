@@ -259,6 +259,8 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
+  return render_template( 'pages/show_artist.html', artist = Artist.query.get(artist_id) )
+  '''
   # shows the artist page with the given artist_id
   # TODO: replace with real artist data from the artist table, using artist_id
   data1={
@@ -334,6 +336,7 @@ def show_artist(artist_id):
   }
   data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
   return render_template('pages/show_artist.html', artist=data)
+  '''
 
 #  Update
 #  ----------------------------------------------------------------
