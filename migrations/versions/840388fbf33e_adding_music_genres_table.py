@@ -44,6 +44,7 @@ def upgrade():
         { 'id':16, 'name':'Reggae' },
         { 'id':17, 'name':'Rock n Roll' },
         { 'id':18, 'name':'Soul' },
+        { 'id':19, 'name':'Swing'}
     ]
     )
     # ### end Alembic commands ###

@@ -44,8 +44,8 @@ class Genre(db.Model):
     name = db.Column(db.String)
 
     def __repr__(self):
-        genre = "Genre(" + str(self.id) + ", " + self.name + ")" + '\n'
-        return genre
+#        genre = "Genre(" + str(self.id) + ", " + self.name + ")" + '\n'
+        return self.name
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
@@ -61,7 +61,7 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_desc = db.Column(db.String)
-    genres = relationship("Genre", secondary=genre_venue_association_table)
+    genres = relationship("Genre", secondary=genre_venue_association_table, backref=db.backref('venues', lazy=True))
 
     def __repr__(self):
         venue = "Venue(" + str(self.id) + ", " + self.name + ")" + '\n'
@@ -80,7 +80,7 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_desc = db.Column(db.String)
-    genres = relationship("Genre", secondary=genre_artist_association_table)
+    genres = relationship("Genre", secondary=genre_artist_association_table, backref=db.backref('artists', lazy=True))
    
     def __repr__(self):
       artist = "Artist(" + str(self.id) + ", " + self.name + ", " + self.city + ")" + '\n'

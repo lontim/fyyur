@@ -362,7 +362,7 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
+  # not mandatory - future enhancement
   # artist record with ID <artist_id> using the new attributes
 
   return redirect(url_for('show_artist', artist_id=artist_id))
@@ -384,12 +384,12 @@ def edit_venue(venue_id):
     "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
     "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
   }
-  # TODO: populate form with values from venue with ID <venue_id>
+  # not mandatory - future enhancement: populate form with values from venue with ID <venue_id>
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
+  # not mandatory - future enhancement: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
   return redirect(url_for('show_venue', venue_id=venue_id))
 
@@ -403,14 +403,30 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-
+  form = ArtistForm()
+  new_artist = Artist (
+    name = form.name.data,
+    city = form.city.data,
+    state = form.state.data,
+    phone = form.phone.data,
+    genres = form.genres.data,
+    website = form.website_link.data,
+    facebook_link = form.facebook_link.data,
+    image_link = form.image_link.data,
+    seeking_venue = form.seeking_venue.data,
+    seeking_desc = form.seeking_description.data
+  )
+  try:
+    db.session.add(new_artist)
+    db.session.commit()
   # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+    flash("Artist " + new_artist.name + " was successfully listed")
+  except Exception as e:
+    db.session.rollback()
+    print (e)
+    flash ("Artist " + new_artist.name + " could not be listed")
+  finally:
+    db.session.close()
   return render_template('pages/home.html')
 
 
