@@ -101,7 +101,7 @@ def upgrade():
             'facebook_link': 'https://www.facebook.com/HITWaustin/',
             'image_link': 'https://static.wixstatic.com/media/58d7b5_a4ca66ff09754240b0a42aa1421676ab~mv2_d_2048_1365_s_2.jpg/v1/fit/w_3198,h_874,q_90/58d7b5_a4ca66ff09754240b0a42aa1421676ab~mv2_d_2048_1365_s_2.jpg',
             'seeking_talent': True,
-            'seeking_desc': "Speak to Doris in the reception booth. We're looking for fresh talented bands."
+            'seeking_desc': "Speak to Doris in the reception booth. We're looking for talented bands in the area."
         }
     ] )
     op.bulk_insert(artist_table,

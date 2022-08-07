@@ -2,6 +2,8 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+# from ptpython.repl import embed
+# embed(globals(), locals())
 import json
 import dateutil.parser
 import babel
@@ -17,7 +19,7 @@ from forms import *
 from common_handles import db, migrate, moment
 import os
 
-from models import Show, Genre, Venue, Artist
+from models import Show, Genre, Venue, Artist, genre_venue_association_table, genre_artist_association_table
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -511,6 +513,7 @@ def make_shell_context():
             'Venue': Venue,
             'Show': Show,
             'genre_venue_assoc': genre_venue_association_table,
+            'genre_artist_assoc': genre_artist_association_table,
             'Artist': Artist
             }
 

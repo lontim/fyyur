@@ -19,6 +19,10 @@ class Show(db.Model):
     artist_id = db.Column("artist_id", ForeignKey("Artist.id"))
     show_start_time = db.Column(db.DateTime)
 
+    def __repr__(self):
+        genre = "Show(id:" + str(self.id) + ", Venue: id:" + self.venue_id + ", Artist: id:" + self.artist_id + ")" + '\n'
+        return genre
+
 genre_venue_association_table = Table(
     "genre_venue_assoc",
     db.Model.metadata,
@@ -39,6 +43,9 @@ class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
 
+    def __repr__(self):
+        genre = "Genre(" + str(self.id) + ", " + self.name + ")" + '\n'
+        return genre
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
@@ -57,7 +64,7 @@ class Venue(db.Model):
     genres = relationship("Genre", secondary=genre_venue_association_table)
 
     def __repr__(self):
-        venue = "Venue(" + self.id + ", " + str(self.name) + ")"
+        venue = "Venue(" + str(self.id) + ", " + self.name + ")" + '\n'
         return venue
 
 class Artist(db.Model):
@@ -76,5 +83,5 @@ class Artist(db.Model):
     genres = relationship("Genre", secondary=genre_artist_association_table)
    
     def __repr__(self):
-      artist = "Artist(" + self.id + ", " + self.name + ", " + self.city + ")"
+      artist = "Artist(" + str(self.id) + ", " + self.name + ", " + self.city + ")" + '\n'
       return artist
