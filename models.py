@@ -68,8 +68,11 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
+    website = db.Column(db.String(500))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean, default=False)
+    seeking_desc = db.Column(db.String)
     genres = relationship("Genre", secondary=genre_artist_association_table)
    
     def __repr__(self):

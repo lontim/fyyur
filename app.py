@@ -109,7 +109,6 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
   return render_template( 'pages/show_venue.html', venue = Venue.query.get(venue_id) )
 
   '''
@@ -227,7 +226,8 @@ def delete_venue(venue_id):
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
-  # TODO: replace with real data returned from querying the database
+  return render_template('pages/artists.html', artists=Artist.query.order_by('name').all())
+  '''
   data=[{
     "id": 4,
     "name": "Guns N Petals",
@@ -238,7 +238,7 @@ def artists():
     "id": 6,
     "name": "The Wild Sax Band",
   }]
-  return render_template('pages/artists.html', artists=data)
+  '''
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
