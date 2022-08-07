@@ -74,7 +74,7 @@ def venues():
     shows = Show.query.filter_by(venue_id=venue.id).all()
 
     for show in shows:
-        if show.start_time > datetime.now():
+        if show.show_start_time > datetime.now():
             upcoming_shows_in_venue += 1
 
     for venue_location in data:
@@ -533,7 +533,22 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
   # displays list of shows at /shows
-  # TODO: replace with real venues data.
+  all_shows = Show.query.all()
+  response_data = []
+  for show in all_shows:
+      show_details = {
+          "venue_id": show.venue_id,
+          "venue_name": show.venue.name,
+          "artist_id": show.artist_id,
+          "artist_name": show.artist.name,
+          "artist_image_link": show.artist.image_link,
+          "show_start_time": str(show.show_start_time),
+      }
+      response_data.append(show_details)
+
+  return render_template("pages/shows.html", shows=response_data)
+
+  return render_template("pages/shows.html", shows=Show.query.all())
   data=[{
     "venue_id": 1,
     "venue_name": "The Musical Hop",

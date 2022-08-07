@@ -62,6 +62,7 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_desc = db.Column(db.String)
     genres = relationship("Genre", secondary=genre_venue_association_table, backref=db.backref('venues', lazy=True))
+    shows = db.relationship("Show", backref="venue", lazy=True)
 
     def __repr__(self):
         venue = "Venue(" + str(self.id) + ", " + self.name + ")" + '\n'
@@ -81,7 +82,8 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_desc = db.Column(db.String)
     genres = relationship("Genre", secondary=genre_artist_association_table, backref=db.backref('artists', lazy=True))
-   
+    shows = db.relationship("Show", backref="artist", lazy=True)
+
     def __repr__(self):
       artist = "Artist(" + str(self.id) + ", " + self.name + ", " + self.city + ")" + '\n'
       return artist
