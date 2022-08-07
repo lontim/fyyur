@@ -109,12 +109,11 @@ def search_venues():
   }
   '''
   venue_output_list = []
-  now = datetime.now()
   for venue in venues:
       venue_shows = Show.query.filter_by(venue_id=venue.id).all()
       num_upcoming_shows = 0
       for show in venue_shows:
-          if show.start_time > now:
+          if show.start_time > datetime.now():
               num_upcoming_shows += 1
 
       venue_output_list.append({
@@ -122,7 +121,6 @@ def search_venues():
           "name": venue.name,
           "num_upcoming_shows": num_upcoming_shows
       })
-
   response = {
       "count": len(venues),
       "data":  venue_output_list
@@ -268,6 +266,26 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
+  search_term = request.form.get ('search_term', '') .strip()
+  artists = Artist.query.filter(Artist.name.ilike('%' + search_term + '%')).all()   # Wildcards search before and after
+  artist_output_list = []
+  for artist in artists:
+      artist_shows = Show.query.filter_by(artist_id=artist.id).all()
+      num_upcoming_shows = 0
+      for show in artist_shows:
+          if show.start_time > datetime.now():
+              num_upcoming_shows += 1
+
+      artist_output_list.append({
+          "id": artist.id,
+          "name": artist.name,
+          "num_upcoming_shows": num_upcoming_shows
+      })
+  response = {
+      "count": len(artists),
+      "data":  artist_output_list
+  }
+  '''
   response={
     "count": 1,
     "data": [{
@@ -276,6 +294,7 @@ def search_artists():
       "num_upcoming_shows": 0,
     }]
   }
+  '''
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/artists/<int:artist_id>')
