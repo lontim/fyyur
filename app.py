@@ -130,7 +130,44 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
-  return render_template( 'pages/show_venue.html', venue = Venue.query.get(venue_id) )
+  venue = Venue.query.get(venue_id)
+  shows_at_venue = Show.query.filter_by(venue_id=venue_id).all()
+
+  past_shows = []
+  upcoming_shows = []
+  if len(shows_at_venue) > 0:
+      for show in shows_at_venue:
+          data = {
+              "artist_id": show.artist_id,
+              "artist_name": show.artist.name,
+              "artist_image_link": show.artist.image_link,
+              "start_time": format_datetime(str(show.show_start_time)),
+          }
+      if show.show_start_time > datetime.now():
+          upcoming_shows.append(data)
+      else:
+          past_shows.append(data)
+
+  data = {
+      "id": venue.id,
+      "name": venue.name,
+      "genres": venue.genres,
+      "address": venue.address,
+      "city": venue.city,
+      "state": venue.state,
+      "phone": venue.phone,
+      "website": venue.website,
+      "facebook_link": venue.facebook_link,
+      "seeking_talent": venue.seeking_talent,
+      "seeking_description": venue.seeking_desc,
+      "image_link": venue.image_link,
+      "past_shows": past_shows,
+      "upcoming_shows": upcoming_shows,
+      "past_shows_count": len(past_shows),
+      "upcoming_shows_count": len(upcoming_shows),
+  }
+  return render_template("pages/show_venue.html", venue=data)
+  # return render_template( 'pages/show_venue.html', venue = Venue.query.get(venue_id) )
 
   '''
   data1={

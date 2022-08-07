@@ -31,8 +31,8 @@ def upgrade():
     [
         {'id':0, 'venue_id': 1, 'artist_id': 4, 'show_start_time': '2019-05-21T21:30:00.000Z' },
         {'id':1, 'venue_id': 3, 'artist_id': 5, 'show_start_time': '2019-06-15T23:00:00.000Z' },
-        {'id':2, 'venue_id': 3, 'artist_id': 6, 'show_start_time': '2035-04-01T20:00:00.000Z' },
-        {'id':3, 'venue_id': 3, 'artist_id': 6, 'show_start_time': '2035-04-08T20:00:00.000Z' },
+        {'id':2, 'venue_id': 3, 'artist_id': 7, 'show_start_time': '2035-04-01T20:00:00.000Z' },
+        {'id':3, 'venue_id': 3, 'artist_id': 7, 'show_start_time': '2035-04-08T20:00:00.000Z' },
         {'id':4, 'venue_id': 3, 'artist_id': 6, 'show_start_time': '2035-04-15T20:00:00.000Z' }
         
     ] )
