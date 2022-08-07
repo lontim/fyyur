@@ -421,10 +421,10 @@ def create_artist_submission():
 
     genres_list = []    #  convert the text list of Genres into an "Instrumented" List
     for genre_text in form.genres.data:
-      db_instru_genre = Genre.query.filter_by(name=genre_text).one_or_none()
+      genre_instrumented = Genre.query.filter_by(name=genre_text).one_or_none()
       if genre_instrumented:
       # we found the instrumented item! Append instrumented genre to the list
-        new_artist.genres.append(db_instru_genre)
+        new_artist.genres.append(genre_instrumented)
 
     db.session.add(new_artist)
     print (new_artist)
