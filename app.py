@@ -96,6 +96,9 @@ def search_venues():
   # TODO: implement search on venues with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+  search_term = request.form.get ('search_term', '') .strip()
+  venues = Venue.query.filter(Venue.name.ilike('%' + search_term + '%')).all()   # Wildcards search before and after
+  '''
   response={
     "count": 1,
     "data": [{
@@ -103,6 +106,26 @@ def search_venues():
       "name": "The Dueling Pianos Bar",
       "num_upcoming_shows": 0,
     }]
+  }
+  '''
+  venue_output_list = []
+  now = datetime.now()
+  for venue in venues:
+      venue_shows = Show.query.filter_by(venue_id=venue.id).all()
+      num_upcoming_shows = 0
+      for show in venue_shows:
+          if show.start_time > now:
+              num_upcoming_shows += 1
+
+      venue_output_list.append({
+          "id": venue.id,
+          "name": venue.name,
+          "num_upcoming_shows": num_upcoming_shows
+      })
+
+  response = {
+      "count": len(venues),
+      "data":  venue_output_list
   }
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
@@ -336,12 +359,59 @@ def show_artist(artist_id):
   return render_template('pages/show_artist.html', artist=data)
   '''
 
+#  Delete artist
+#  ----------------------------------------------------------------
+@app.route('/artist/<artist_id>', methods=['DELETE'])
+def delete_artist(artist_id):
+  # Stretch Goal: Complete this endpoint for taking an artist_id, and using
+  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+  artist = Artist.query.get(artist_id)
+  if not artist:
+      return redirect(url_for('index'))
+  else:
+    delete_error = False
+    artist_name = artist.name
+    try:
+      db.session.delete(artist)
+      db.session.commit()
+    except:
+      delete_error = True
+      db.session.rollback()
+    finally:
+      db.session.close()
+    if delete_error:
+      flash("We couldn't remove " + artist_name)
+      abort(500)
+    else:
+      flash("Artist " +artist_name+ " was deleted.")
+      return redirect(url_for('index'))
+  return None
+
+
 #  Update
 #  ----------------------------------------------------------------
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
-  form = ArtistForm()
   artist = Artist.query.get(artist_id)
+  genres_string = [ genre.name for genre in artist.genres ]
+#  genre_list = genres_string.split(",") 
+#  form = ArtistForm(genres = ['Electronic','Other'])
+  form = ArtistForm(genres = genres_string)
+  # convert genres to a dictionary - unable to use artist model to store the genres_string
+  artist = {
+        "id": artist_id,
+        "name": artist.name,
+        "genres": genres_string,
+        "city": artist.city,
+        "state": artist.state,
+        "phone": artist.phone,
+        "website": artist.website,
+        "facebook_link": artist.facebook_link,
+        "seeking_venue": artist.seeking_venue,
+        "seeking_description": artist.seeking_desc,
+        "image_link": artist.image_link
+  }
+  # form.genres.data = [1, 3]
   return render_template('forms/edit_artist.html', form=form, artist=artist)
   '''
   artist={
@@ -404,26 +474,24 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   form = ArtistForm()
-  genres_list = ['Alternative','Classical']
   try:
     new_artist = Artist (
       name = form.name.data,
       city = form.city.data,
       state = form.state.data,
       phone = form.phone.data,
-#      genres = genres_list,     #  this is actually an Instrumented List
+#      genres = genres_list,     #  this needs to be an instrumented list, see below
       website = form.website_link.data,
       facebook_link = form.facebook_link.data,
       image_link = form.image_link.data,
       seeking_venue = form.seeking_venue.data,
       seeking_desc = form.seeking_description.data
     )
-
-    genres_list = []    #  convert the text list of Genres into an "Instrumented" List
+    genres_list = []    #  convert text Genres into "Instrumented" ones via DB lookup
     for genre_text in form.genres.data:
       genre_instrumented = Genre.query.filter_by(name=genre_text).one_or_none()
       if genre_instrumented:
-      # we found the instrumented item! Append instrumented genre to the list
+      # we found the genre. Append instrumented genre to our list
         new_artist.genres.append(genre_instrumented)
 
     db.session.add(new_artist)
@@ -541,7 +609,8 @@ def make_shell_context():
             'Show': Show,
             'genre_venue_assoc': genre_venue_association_table,
             'genre_artist_assoc': genre_artist_association_table,
-            'Artist': Artist
+            'Artist': Artist,
+            'render_template': render_template
             }
 
 
