@@ -404,27 +404,37 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   form = ArtistForm()
-  new_artist = Artist (
-    name = form.name.data,
-    city = form.city.data,
-    state = form.state.data,
-    phone = form.phone.data,
-    genres = form.genres.data,
-    website = form.website_link.data,
-    facebook_link = form.facebook_link.data,
-    image_link = form.image_link.data,
-    seeking_venue = form.seeking_venue.data,
-    seeking_desc = form.seeking_description.data
-  )
+  genres_list = ['Alternative','Classical']
   try:
+    new_artist = Artist (
+      name = form.name.data,
+      city = form.city.data,
+      state = form.state.data,
+      phone = form.phone.data,
+#      genres = genres_list,     #  this is actually an Instrumented List
+      website = form.website_link.data,
+      facebook_link = form.facebook_link.data,
+      image_link = form.image_link.data,
+      seeking_venue = form.seeking_venue.data,
+      seeking_desc = form.seeking_description.data
+    )
+
+    genres_list = []    #  convert the text list of Genres into an "Instrumented" List
+    for genre_text in form.genres.data:
+      db_instru_genre = Genre.query.filter_by(name=genre_text).one_or_none()
+      if genre_instrumented:
+      # we found the instrumented item! Append instrumented genre to the list
+        new_artist.genres.append(db_instru_genre)
+
     db.session.add(new_artist)
+    print (new_artist)
     db.session.commit()
   # on successful db insert, flash success
     flash("Artist " + new_artist.name + " was successfully listed")
   except Exception as e:
     db.session.rollback()
     print (e)
-    flash ("Artist " + new_artist.name + " could not be listed")
+    flash ("Artist " + form.name.data + " could not be listed")
   finally:
     db.session.close()
   return render_template('pages/home.html')
