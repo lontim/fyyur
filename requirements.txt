@@ -6,3 +6,4 @@ flask_sqlalchemy
 Werkzeug==2.0.0
 jinja2==3.0.3
 flask_migrate
+psycopg2
