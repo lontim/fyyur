@@ -278,11 +278,12 @@ def create_venue_form():
 def create_venue_submission():
   form = VenueForm()
   try:
+    phone_check(form.phone.data)
     new_venue = Venue (
       name = form.name.data,
       city = form.city.data,
       state = form.state.data,
-      phone = phone_check(form.phone.data),
+      phone = form.phone.data,
 #      genres = genres_list,     #  this needs to be an instrumented list, see below
       website = form.website_link.data,
       facebook_link = form.facebook_link.data,
@@ -612,11 +613,12 @@ def create_artist_form():
 def create_artist_submission():
   form = ArtistForm()
   try:
+    phone_check(form.phone.data)
     new_artist = Artist (
       name = form.name.data,
       city = form.city.data,
       state = form.state.data,
-      phone = phone_check(form.phone.data),
+      phone = form.phone.data,
 #      genres = genres_list,     #  this needs to be an instrumented list, see below
       website = form.website_link.data,
       facebook_link = form.facebook_link.data,
