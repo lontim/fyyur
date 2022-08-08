@@ -18,6 +18,9 @@ from flask_wtf import Form
 from forms import *
 from common_handles import db, migrate, moment
 import os
+import phonenumbers
+from wtforms import ValidationError
+
 
 from models import Show, Genre, Venue, Artist, genre_venue_association_table, genre_artist_association_table
 
@@ -45,6 +48,17 @@ def format_datetime(value, format='medium'):
   return babel.dates.format_datetime(date, format, locale='en')
 
 app.jinja_env.filters['datetime'] = format_datetime
+
+#----------------------------------------------------------------------------#
+# Validation.
+#----------------------------------------------------------------------------#
+
+def phone_check(num):
+    parsed = phonenumbers.parse(num, "US")
+    if not phonenumbers.is_valid_number(parsed):
+        raise ValidationError('Must be a valid telephone number.')
+
+
 
 #----------------------------------------------------------------------------#
 # Controllers.
@@ -259,16 +273,46 @@ def create_venue_form():
   form = VenueForm()
   return render_template('forms/new_venue.html', form=form)
 
+
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  form = VenueForm()
+  try:
+    new_venue = Venue (
+      name = form.name.data,
+      city = form.city.data,
+      state = form.state.data,
+      phone = phone_check(form.phone.data),
+#      genres = genres_list,     #  this needs to be an instrumented list, see below
+      website = form.website_link.data,
+      facebook_link = form.facebook_link.data,
+      image_link = form.image_link.data,
+      seeking_talent = form.seeking_talent.data,
+      seeking_desc = form.seeking_description.data
+    )
+    genres_list = []    #  convert text Genres into "Instrumented" ones via DB lookup
+    for genre_text in form.genres.data:
+      genre_instrumented = Genre.query.filter_by(name=genre_text).one_or_none()
+      if genre_instrumented:
+      # we found the genre. Append instrumented genre to our list
+        new_venue.genres.append(genre_instrumented)
 
+    db.session.add(new_venue)
+    print (new_venue)
+    db.session.commit()
   # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    flash("Venue " + new_venue.name + " was successfully listed")
+  except ValidationError as e:
+      # ValidationError means the phone number check failed
+      db.session.rollback()
+      print (e)
+      flash("Venue " + form.name.data + " could not be listed")
+  except Exception as e:
+    db.session.rollback()
+    print (e)
+    flash ("Venue " + form.name.data + " could not be listed")
+  finally:
+    db.session.close()
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -563,6 +607,7 @@ def create_artist_form():
   form = ArtistForm()
   return render_template('forms/new_artist.html', form=form)
 
+
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   form = ArtistForm()
@@ -571,7 +616,7 @@ def create_artist_submission():
       name = form.name.data,
       city = form.city.data,
       state = form.state.data,
-      phone = form.phone.data,
+      phone = phone_check(form.phone.data),
 #      genres = genres_list,     #  this needs to be an instrumented list, see below
       website = form.website_link.data,
       facebook_link = form.facebook_link.data,
@@ -591,6 +636,11 @@ def create_artist_submission():
     db.session.commit()
   # on successful db insert, flash success
     flash("Artist " + new_artist.name + " was successfully listed")
+  except ValidationError as e:
+      # ValidationError means the phone number check failed
+      db.session.rollback()
+      print (e)
+      flash("Artist " + form.name.data + " could not be listed")
   except Exception as e:
     db.session.rollback()
     print (e)

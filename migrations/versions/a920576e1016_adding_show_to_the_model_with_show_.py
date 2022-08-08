@@ -7,7 +7,7 @@ Create Date: 2022-08-06 16:22:37.721370
 """
 from alembic import op
 import sqlalchemy as sa
-
+from common_handles import db
 
 # revision identifiers, used by Alembic.
 revision = 'a920576e1016'
@@ -34,9 +34,9 @@ def upgrade():
         {'id':2, 'venue_id': 3, 'artist_id': 7, 'show_start_time': '2035-04-01T20:00:00.000Z' },
         {'id':3, 'venue_id': 3, 'artist_id': 7, 'show_start_time': '2035-04-08T20:00:00.000Z' },
         {'id':4, 'venue_id': 3, 'artist_id': 6, 'show_start_time': '2035-04-15T20:00:00.000Z' }
-        
     ] )
     # ### end Alembic commands ###
+    op.execute('alter sequence "Show_id_seq" restart with 5')
 
 
 def downgrade():
